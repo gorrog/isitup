@@ -1,9 +1,10 @@
 # Things to do:
-* Get Santiago's feedback on Scope Document
+
 * Use cron  to schedule python to run every 5 minutes
     how to test cron
-# use ping to ping our servers 
-
+# Use requests to get responses from webpages
+    use timeout function to check for web page being down
+    
 
 # Use some sort of database to store results
 # upload results to be added to twittter
