@@ -26,7 +26,7 @@ To increase public awareness and scrutiny of South Africa's Government e-Service
 * If time: The ability for an administrator to approve or reject the URL submission.
 
 ### Services to be Used
-* Each website added to the list will be contacted periodically at its public URL using ping.
+* Each website added to the list will be contacted periodically at its public URL using http.
 * Twitter's API will be used to post status updates.
 
 ### Technical Details
