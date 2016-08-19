@@ -93,7 +93,6 @@ class SiteCheckerTest(unittest.TestCase):
             sql_query = f.read()
         cur = self.myConnection.cursor()
         for statement in sql_query.split(';'):
-            print(statement + ';')
             cur.execute(statement + ';')
             self.myConnection.commit()
         
