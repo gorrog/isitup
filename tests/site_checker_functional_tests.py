@@ -1,8 +1,12 @@
+# -*- coding: utf-8 -*-
 import unittest
 import psycopg2
 import requests
 import os
-
+from site_checker.site_checker import (
+    check_site
+    )
+import datetime
 HOSTNAME = 'web528.webfaction.com'
 USERNAME = 'gorrog'
 PASSWORD = 'IsItUpAdmin012'
@@ -73,11 +77,59 @@ class SiteCheckerTest(unittest.TestCase):
         # Included in the tweet is the time it was tried and the IP it was tried from. The
         # tweet mentions the person/organisation who is responsible for it.
         
-    def test_availabel_site(self):
-        pass
-        # The second item on the list, monkeyfishboat.ol was due to be checked 20 seconds ago.
+    def test_available_site(self):
+        # The second item on the list, monkeyfishboat.ol was due to be checked some time ago.
         # The program attempts to connect to the site. The site is accessible without an error.
-        # The program records this successful access in the database under this URL.
+        sql_string = """
+            INSERT
+            INTO
+            site
+            (
+            url,
+            schedule,
+            last_checked,
+            last_status
+            )
+            VALUES
+            (
+            'monkeyfishboat.ol',
+            '30 minutes',
+            '2016-08-20 12:15:03.946442+00',
+            200
+            )
+        """
+        cur = self.myConnection.cursor()
+        cur.execute(sql_string)
+        self.myConnection.commit()
+        
+        print ("inserted values in the table")
+        check_site()
+        sql_string = """
+            SELECT
+            last_checked
+            FROM
+            site
+            WHERE
+            url = 'monkeyfishboat.ol'
+        """
+        cur = self.myConnection.cursor()
+        cur.execute(sql_string)
+        results = cur.fetchall()
+        print(results)
+        # The program records this successful access in the database under this URL
+        # by updating the 'last_checked' value.
+        returned_time = results[0][0]
+        current_date_time = datetime.datetime.now(tz=returned_time.tzinfo)
+        print current_date_time - returned_time
+        self.assertTrue(current_date_time - returned_time < datetime.timedelta(seconds=60))
+        
+        # if current_date_time - returned_time < datetime.timedelta(seconds=60):
+        #     self.assert
+        # else:
+        #     print("failed")
+        
+        
+        
         
     def test_site_not_yet_due(self):
         pass
@@ -88,7 +140,7 @@ class SiteCheckerTest(unittest.TestCase):
     
     def initialise_database(self):
         # Initialise test database
-        file_path=os.path.normpath(os.path.join(os.getcwd(),os.pardir,'site_checker','is_it_up_schema.sql'))
+        file_path=os.path.normpath(os.path.join(os.getcwd(),'site_checker','is_it_up_schema.sql'))
         with open(file_path, 'r') as f:
             sql_query = f.read()
         cur = self.myConnection.cursor()

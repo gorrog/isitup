@@ -1,7 +1,7 @@
 DROP
 TABLE
 IF EXISTS
-url
+site
 CASCADE;
 
 DROP
@@ -12,7 +12,7 @@ CASCADE;
 
 CREATE
 TABLE
-url (
+site (
 id SERIAL UNIQUE PRIMARY KEY,
 url text UNIQUE,
 schedule interval,
@@ -24,7 +24,7 @@ CREATE
 TABLE
 error (
 id SERIAL UNIQUE PRIMARY KEY,
-url_id integer REFERENCES url (id),
+site_id integer REFERENCES site (id),
 error_timestamp timestamptz DEFAULT CURRENT_TIMESTAMP,
 error_code integer
 )
