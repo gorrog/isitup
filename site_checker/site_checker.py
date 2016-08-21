@@ -1,51 +1,49 @@
 # -*- coding: utf-8 -*-
 import requests
-import flask
+# import flask
 import psycopg2
+import logging
+import logging.handlers
+import datetime
  
+from site_checker.settings import (
+    HOSTNAME,
+    USERNAME,
+    PASSWORD,
+    DATABASE,
+    LOG_FILE
+    )
 
+def connect_db(host_name, user_name, password, database):
+    try:
+        myConnection = psycopg2.connect(host = host_name, user = user_name, password = password, dbname = database)
+        return myConnection
+    except:
+        my_logger = logging.getLogger()
+        my_logger.error("Can't connect to database. Exiting.")
 
-# page = requests.get('http://www.sabcsport.co.za/', timeout=5)
-# # pdb.set_trace()
+    
+def init():
+    my_logger = logging.getLogger()
+    my_logger.setLevel(logging.INFO) 
+    # Add the log message handler to the logger
+    # Loggin file sizes limited to 5 files of about 100 Kb
+    # TODO: fix warning from file not closed caused by 3 lines below
+    handler = logging.handlers.RotatingFileHandler(
+                  LOG_FILE, maxBytes=100000, backupCount=4)
+    my_logger.addHandler(handler)
 
-# # DB details
-# # username gorrog(totally not)
-# # IsItUpAdmin012
-# # hostname: web528.webfaction.com
-# # port: 5432
-# # database name: isitup
+    my_logger.info("Started at {}".format(datetime.datetime.now()))
 
+def finish():
+    my_logger = logging.getLogger()
+    my_logger.info("Finished at {}".format(datetime.datetime.now()))
+    
 
-
-# #!/usr/bin/python
-
-# hostname = 'web528.webfaction.com'
-# username = 'gorrog'
-# password = 'IsItUpAdmin012'
-# database = 'isitup'
-
-
-
-
-# # print "Using psycopg2"
-# # import psycopg2
-# # import pdb; pdb.set_trace()
-# myConnection = psycopg2.connect( host=hostname, user=username, password=password, dbname=database )
-# sql_string = '''
-#     CREATE
-#     TABLE
-#     "test"
-#     (
-#     "col1" int,
-#     "col2" text
-#     );
-# '''
-# # doQuery( myConnection )
-# cur = myConnection.cursor()
-# cur.execute(sql_string)
-# myConnection.commit()
-
-# myConnection.close()
-
-def check_site():
+def check_site(host_name = HOSTNAME, user_name = USERNAME, password = PASSWORD, database = DATABASE):
+    init()
     print("This is running in site_checker.py")
+    print("host_name is {}, user_name is {}, password is {}, database is {}".format(host_name, user_name, password, database))
+    
+    my_connection = connect_db(host_name, user_name, password, database)
+    finish()
