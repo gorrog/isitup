@@ -94,12 +94,12 @@ class SiteCheckerTest(unittest.TestCase):
         # same
         check_site(database = DATABASE)
         sql_string = """
-            SELECT (
+            SELECT 
                 site_id,
                 error_timestamp,
                 error_code
-            )
-            From
+            
+            from
             error;
         """
         cur = self.myConnection.cursor()
@@ -154,7 +154,7 @@ class SiteCheckerTest(unittest.TestCase):
         cur = self.myConnection.cursor()
         cur.execute(sql_string)
         self.myConnection.commit()
-        check_site()
+        check_site(database = DATABASE)
         sql_string = """
             SELECT
             last_checked
