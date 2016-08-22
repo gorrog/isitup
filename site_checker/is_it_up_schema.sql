@@ -17,6 +17,7 @@ id SERIAL UNIQUE PRIMARY KEY,
 url text UNIQUE,
 schedule interval,
 last_status smallint,
+first_checked timestamptz DEFAULT CURRENT_TIMESTAMP
 last_checked timestamptz DEFAULT CURRENT_TIMESTAMP
 );
 

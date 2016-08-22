@@ -3,7 +3,7 @@ import unittest
 import psycopg2
 import requests
 import os
-from site_checker.site_checker import check_site
+from site_checker.site_checker import check_all_sites
 import datetime
 import logging
 from testfixtures import LogCapture
@@ -15,6 +15,8 @@ from test_settings import (
     DATABASE
     )
 
+# TODO: Reformat all lines to not go over column 79
+
 class SiteCheckerTest(unittest.TestCase):
     
 
@@ -22,7 +24,8 @@ class SiteCheckerTest(unittest.TestCase):
     # site_checker.py to run every 5 minutes, it is launched
         
     def setUp(self):
-        self.myConnection = psycopg2.connect( host=HOSTNAME, user=USERNAME, password=PASSWORD, dbname=DATABASE )
+        self.myConnection = psycopg2.connect( host=HOSTNAME, user=USERNAME, 
+        password=PASSWORD, dbname=DATABASE )
         self.initialise_database()
     
     def tearDown(self):
@@ -31,39 +34,30 @@ class SiteCheckerTest(unittest.TestCase):
     def test_bad_database_connection_results_in_log_entries(self):
         # The program attempts to connect to our database
         # Unfortunately, the database server can't be reached.
-        # The program creates a new log entry recording this connection error. The date
-        # and time of the conneciton attempt are also logged.
+        # The program creates a new log entry recording this connection error. 
+        # The date and time of the conneciton attempt are also logged.
         # The program saves a log entry saying it is exiting, and then closes.
-        with LogCapture(level = logging.ERROR) as l:
-        # with LogCapture() as l:
-            # We pass the check_site() function bad conneciton data
-            check_site(password = 'BadPassword')
-            l.check(
-             ('root', 'ERROR', "Can't connect to database. Exiting.")
-            ) 
-        
-        
-    #def test_successful_database_connection(self):
-    #     self.fail("Finish the tests")
-    #     add test_table  to database
-    #     return from database our test
-    #     assertEquals ()
-        
-        # 12:10am arrives on our server and since our cron job has set
-        # site_checker.py to run every 5 minutes, it is launched
-        # The program attempts to connect to our database
-        # Unfortunately, the database server can't be reached.
-        # The program creates a new log entry recording this connection error. The date
-        # and time of the conneciton attempt are also logged.
-        # The program waits 10 seconds, just in case there was a network anomoly.
-        # The program attempts to connect to our database again.
-        # This time the connection is successful.
+        # import pdb; pdb.set_trace()
+        with self.assertRaisesRegex(ConnectionError, 
+        "Could not connect to the database! Aborting"):
+            with LogCapture(level = logging.ERROR) as l:
+                # We pass the check_site() function bad conneciton data
+                check_all_sites(password = 'BadPassword')
+                l.check(
+                 ('root', 'ERROR', "Can't connect to database. Exiting.")
+                ) 
+            
+      
         
     def test_unavailable_site(self):
-        # The first url on the list to be checked, gorrog.org/blah was due to be checked some time ago
-        # The program attempts to connect to the site but the connection times out
-        # The program records this time out event in the database, linked to the url
-        # The program waits 10 seconds, just in case there was a network anomoly.
+        # rewrite /// later
+        # The first url on the list to be checked, gorrog.org/
+        # blah was due to be checked some time ago
+        # The program attempts to connect to the site 
+        # but the connection times out
+        # The program records this time out event in the database,
+        # linked to the url
+        # The program waits 10 seconds, just in case there was a network anomaly.
         # The program attempts to connect to the site again but the connection times out
         # The program records this time out event in the database, linked to the url
         # The program waits a final 10 seconds, just in case there was a network anomoly.
@@ -81,7 +75,7 @@ class SiteCheckerTest(unittest.TestCase):
             )
             VALUES
             (
-            'gorrog.org/blah',
+            'http://gorrog.org/blah',
             '30 minutes',
             '2016-08-20 12:15:03.946442+00',
             200
@@ -92,7 +86,7 @@ class SiteCheckerTest(unittest.TestCase):
         self.myConnection.commit() 
         # run the test function with our test database. Other credentials are the
         # same
-        check_site(database = DATABASE)
+        check_all_sites(database = DATABASE)
         sql_string = """
             SELECT 
                 site_id,
@@ -113,7 +107,7 @@ class SiteCheckerTest(unittest.TestCase):
         self.assertEquals(site_id == 1)
         current_date_time = datetime.datetime.now(tz=error_timestamp.tzinfo)
         self.assertTrue(current_date_time - error_timestamp < datetime.timedelta(seconds=60))
-        self.assertEquals(error_code == 404)
+        self.assertEqual(error_code, 404)
         # The first url on the list to be checked, gorrog.org/blah was due to be checked some time ago
         # The program attempts to connect to the site but the connection times out
         # The program records this time out event in the database, linked to the url
@@ -131,7 +125,7 @@ class SiteCheckerTest(unittest.TestCase):
         # tweet mentions the person/organisation who is responsible for it.
         
     def test_available_site(self):
-        # The second item on the list, monkeyfishboat.ol was due to be checked some time ago.
+        # The second item on the list, gorrog.org was due to be checked some time ago.
         # The program attempts to connect to the site. The site is accessible without an error.
         sql_string = """
             INSERT
@@ -145,7 +139,7 @@ class SiteCheckerTest(unittest.TestCase):
             )
             VALUES
             (
-            'monkeyfishboat.ol',
+            'http://gorrog.org',
             '30 minutes',
             '2016-08-20 12:15:03.946442+00',
             200
@@ -154,14 +148,15 @@ class SiteCheckerTest(unittest.TestCase):
         cur = self.myConnection.cursor()
         cur.execute(sql_string)
         self.myConnection.commit()
-        check_site(database = DATABASE)
+        check_all_sites(database = DATABASE)
         sql_string = """
             SELECT
-            last_checked
+            last_checked,
+            last_status
             FROM
             site
             WHERE
-            url = 'monkeyfishboat.ol'
+            url = 'http://gorrog.org'
         """
         cur = self.myConnection.cursor()
         cur.execute(sql_string)
@@ -169,12 +164,11 @@ class SiteCheckerTest(unittest.TestCase):
         # The program records this successful access in the database under this URL
         # by updating the 'last_checked' value.
         returned_time = results[0][0]
+        returned_status = results[0][1]
         current_date_time = datetime.datetime.now(tz=returned_time.tzinfo)
         self.assertTrue(current_date_time - returned_time < datetime.timedelta(seconds=60))
-        
-        
-        
-        
+        self.assertEqual(returned_status, 200)
+    
         
     def test_site_not_yet_due(self):
         self.fail("Finish the tests")
