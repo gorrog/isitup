@@ -47,9 +47,56 @@ class SiteCheckerTest(unittest.TestCase):
                  ('root', 'ERROR', "Can't connect to database. Exiting.")
                 ) 
             
+    def test_site_does_not_exist(self):
+        # Site isn't a website
+        sql_string = """
+            INSERT
+            INTO
+            site
+            (
+            url,
+            schedule,
+            last_checked,
+            last_status
+            )
+            VALUES
+            (
+            'http://gorrog.gorrog.poop',
+            '30 minutes',
+            '2016-08-20 12:15:03.946442+00',
+            200
+            )
+        """
+        cur = self.myConnection.cursor()
+        cur.execute(sql_string)
+        self.myConnection.commit() 
+        # run the test function with our test database. Other credentials are the
+        # same
+        check_all_sites(database = DATABASE)
+        sql_string = """
+            SELECT 
+                site_id,
+                error_timestamp,
+                error_code
+            
+            from
+            error;
+        """
+        cur = self.myConnection.cursor()
+        cur.execute(sql_string)
+        results = cur.fetchall()
+        if not results:
+            self.fail("Program didn't add an error to the error table")
+        site_id = results[0][0]
+        error_timestamp = results[0][1]
+        error_code = results[0][2]
+        self.assertEquals(site_id == 1)
+        current_date_time = datetime.datetime.now(tz=error_timestamp.tzinfo)
+        self.assertTrue(current_date_time - error_timestamp < datetime.timedelta(seconds=60))
+        self.assertEqual(error_code, 999)
       
         
-    def test_unavailable_site(self):
+    def test_site_error(self):
         # rewrite /// later
         # The first url on the list to be checked, gorrog.org/
         # blah was due to be checked some time ago

@@ -53,7 +53,6 @@ def check_all_sites(host_name = HOSTNAME, user_name = USERNAME,
     Checks the list of sites in the database and updates the database according
     to each site's availability
     '''
-    
     # Get the list of sites to check
     init()
     # print("host_name is {}, user_name is {}, password is {}, database is 
@@ -68,11 +67,13 @@ def check_all_sites(host_name = HOSTNAME, user_name = USERNAME,
         schedule = site_data[1]
         last_checked = site_data[3]
         # If it is due, check it and update the status and last checked date
-        if schedule_due(schedule, last_checked):
+        if schedule_due(schedule, last_checked, my_connection):
             print("The schedule is due!")
             url = site_data[0]
-            status = check_site(url)
-            print("The status for url {} is {}".format(url, status))
+            status_code = check_site(url)
+            update_site(my_connection, url, status_code, last_checked.tzinfo)
+            if status_code == 999:
+                print("The status for url {} is {}".format(url, status_code))
         else:
             print("The schedule isn't due")
         # If there was an error add a new record to the error table.
@@ -81,7 +82,7 @@ def check_all_sites(host_name = HOSTNAME, user_name = USERNAME,
 
 def get_sites(my_connection):
     ''' 
-    
+    Get the list of sites to check from the database.
     '''
     sql_string="""
         SELECT 
@@ -92,16 +93,14 @@ def get_sites(my_connection):
         FROM
         site;
     """
-    
     cur = my_connection.cursor()
     cur.execute(sql_string)
     results = cur.fetchall()
     print(results)
     return results
-    
 
 
-def schedule_due(schedule, last_checked):
+def schedule_due(schedule, last_checked, my_connection):
     '''
     Passing the data for a website that is overdue for a checkup 
     '''
@@ -113,7 +112,38 @@ def schedule_due(schedule, last_checked):
 
 def check_site(url):
     '''
-    Tries to access a URL. Returns a status corresponding to the URL's status
+    Tries to access a URL. Returns the status returned by the server, or '999'
+    if the site is unreachable
     '''
-    r = requests.get(url)
-    return r.status_code
+    try:
+        r = requests.get(url)
+        return(r.status_code)
+    # requests.get() will raise a connection error if a connection isn't
+    # possible
+    except requests.exceptions.ConnectionError:
+        return(999)
+    # We should not get here. Raise an error if we do!
+    raise RuntimeError(
+        "Function check_site() was unable to check the requested url, Exiting!"
+    )
+        
+    
+def update_site(my_connection, url, status_code, timezone):
+    ''' 
+    Update the current site with a status code and last_checked value
+    '''
+    sql_string="""
+        UPDATE 
+        site
+        SET
+        last_status = %s,
+        last_checked = %s
+        WHERE
+        url = %s;
+    """
+    current_date_time = datetime.datetime.now(tz=timezone)
+    cur = my_connection.cursor()
+    data = (status_code, current_date_time, url)
+    cur.execute(sql_string, data)
+    my_connection.commit()
+    
