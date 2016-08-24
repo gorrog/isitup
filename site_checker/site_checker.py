@@ -52,20 +52,16 @@ def check_all_sites(host_name = HOSTNAME, user_name = USERNAME,
     '''
     # Get the list of sites to check
     init()
-    # print("host_name is {}, user_name is {}, password is {}, database is
-    # {}".format(host_name, user_name, password, database))
 
     my_connection = connect_db(host_name, user_name, password, database)
     sites_list = get_sites(my_connection)
     # For each site:
     for site_data in sites_list:
-        print(site_data)
         # See if it is due for a check according to the schedule
         schedule = site_data[2]
         last_checked = site_data[4]
         # If it is due, check it and update the status and last checked date
         if schedule_due(schedule, last_checked, my_connection):
-            print("The schedule is due!")
             url = site_data[1]
             site_id = site_data[0]
             status_code = check_site(url)
@@ -73,11 +69,9 @@ def check_all_sites(host_name = HOSTNAME, user_name = USERNAME,
             update_site(my_connection, site_id, status_code, current_date_time)
             # If there was an error add a new record to the error table.
             if status_code > 399:
-                print("The status for url {} is {}, so we have an error"
-                      .format(url, status_code))
                 add_error(my_connection, site_id, status_code, current_date_time)
         else:
-            print("The schedule isn't due")
+            pass
     finish()
 
 def get_sites(my_connection):
@@ -97,7 +91,6 @@ def get_sites(my_connection):
     cur = my_connection.cursor()
     cur.execute(sql_string)
     results = cur.fetchall()
-    print(results)
     return results
 
 
