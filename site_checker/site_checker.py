@@ -16,7 +16,7 @@ from site_checker.settings import (
 
 def connect_db(host_name, user_name, password, database):
     try:
-        myConnection = psycopg2.connect(host = host_name, user = user_name, 
+        myConnection = psycopg2.connect(host = host_name, user = user_name,
         password = password, dbname = database)
         return myConnection
     except:
@@ -24,7 +24,6 @@ def connect_db(host_name, user_name, password, database):
         my_logger.error("Can't connect to database. Exiting.")
         raise ConnectionError("Could not connect to the database! Aborting")
 
-    
 def init():
     '''
     Add the log message handler to the logger
@@ -32,7 +31,7 @@ def init():
     TODO: fix warning from file not closed caused by 3 lines below
     '''
     my_logger = logging.getLogger()
-    my_logger.setLevel(logging.INFO) 
+    my_logger.setLevel(logging.INFO)
     handler = logging.handlers.RotatingFileHandler(
                   LOG_FILE, maxBytes=100000, backupCount=4)
     my_logger.addHandler(handler)
@@ -41,13 +40,11 @@ def init():
 
 def finish():
     '''
-    
     '''
     my_logger = logging.getLogger()
     my_logger.info("Finished at {}".format(datetime.datetime.now()))
-    
 
-def check_all_sites(host_name = HOSTNAME, user_name = USERNAME, 
+def check_all_sites(host_name = HOSTNAME, user_name = USERNAME,
                 password = PASSWORD, database = DATABASE):
     '''
     Checks the list of sites in the database and updates the database according
@@ -55,37 +52,41 @@ def check_all_sites(host_name = HOSTNAME, user_name = USERNAME,
     '''
     # Get the list of sites to check
     init()
-    # print("host_name is {}, user_name is {}, password is {}, database is 
+    # print("host_name is {}, user_name is {}, password is {}, database is
     # {}".format(host_name, user_name, password, database))
-    
+
     my_connection = connect_db(host_name, user_name, password, database)
-    sites_list = get_sites(my_connection) 
+    sites_list = get_sites(my_connection)
     # For each site:
     for site_data in sites_list:
         print(site_data)
         # See if it is due for a check according to the schedule
-        schedule = site_data[1]
-        last_checked = site_data[3]
+        schedule = site_data[2]
+        last_checked = site_data[4]
         # If it is due, check it and update the status and last checked date
         if schedule_due(schedule, last_checked, my_connection):
             print("The schedule is due!")
-            url = site_data[0]
+            url = site_data[1]
+            site_id = site_data[0]
             status_code = check_site(url)
-            update_site(my_connection, url, status_code, last_checked.tzinfo)
-            if status_code == 999:
-                print("The status for url {} is {}".format(url, status_code))
+            current_date_time = datetime.datetime.now(last_checked.tzinfo)
+            update_site(my_connection, site_id, status_code, current_date_time)
+            # If there was an error add a new record to the error table.
+            if status_code > 399:
+                print("The status for url {} is {}, so we have an error"
+                      .format(url, status_code))
+                add_error(my_connection, site_id, status_code, current_date_time)
         else:
             print("The schedule isn't due")
-        # If there was an error add a new record to the error table.
     finish()
-    
 
 def get_sites(my_connection):
-    ''' 
+    '''
     Get the list of sites to check from the database.
     '''
     sql_string="""
-        SELECT 
+        SELECT
+            id,
             url,
             schedule,
             last_status,
@@ -102,7 +103,7 @@ def get_sites(my_connection):
 
 def schedule_due(schedule, last_checked, my_connection):
     '''
-    Passing the data for a website that is overdue for a checkup 
+    Passing the data for a website that is overdue for a checkup
     '''
     current_date_time = datetime.datetime.now(tz=last_checked.tzinfo)
     if (last_checked + schedule) <= current_date_time:
@@ -126,24 +127,49 @@ def check_site(url):
     raise RuntimeError(
         "Function check_site() was unable to check the requested url, Exiting!"
     )
-        
-    
-def update_site(my_connection, url, status_code, timezone):
-    ''' 
+
+def update_site(my_connection, id, status_code, current_date_time):
+    '''
     Update the current site with a status code and last_checked value
     '''
     sql_string="""
-        UPDATE 
+        UPDATE
         site
         SET
         last_status = %s,
         last_checked = %s
         WHERE
-        url = %s;
+        id = %s;
     """
-    current_date_time = datetime.datetime.now(tz=timezone)
     cur = my_connection.cursor()
-    data = (status_code, current_date_time, url)
+    data = (status_code, current_date_time, id)
     cur.execute(sql_string, data)
     my_connection.commit()
-    
+
+
+def add_error(my_connection, site_id, status_code, current_date_time):
+    '''
+    Add an error entry to the database for the given site and url
+    '''
+    sql_string="""
+        INSERT
+        INTO
+        error
+        (
+        site_id,
+        error_timestamp,
+        error_code
+        )
+        VALUES
+        (
+        %s,
+        %s,
+        %s
+        )
+    """
+    cur = my_connection.cursor()
+    data = (site_id, current_date_time, status_code)
+    cur.execute(sql_string, data)
+    my_connection.commit()
+
+
