@@ -6,7 +6,11 @@ import os
 from site_checker.site_checker import check_all_sites
 import datetime
 import logging
+import json
+import urllib
 from testfixtures import LogCapture
+from twitter import *
+import time
 
 from test_settings import (
     DATABASE_SETTINGS,
@@ -167,10 +171,56 @@ class SiteCheckerTest(unittest.TestCase):
         # The program records this time out event in the database, linked to the url
 
     def test_tweet_unavailable_site(self):
-        self.fail("Finish the tests")
+        sql_string = """
+            INSERT
+            INTO
+            site
+            (
+            url,
+            schedule,
+            last_checked,
+            last_status
+            )
+            VALUES
+            (
+            'http://example.example.nothing',
+            '30 minutes',
+            '2016-08-20 12:15:03.946442+00',
+            200
+            )
+        """
+        cur = self.myConnection.cursor()
+        cur.execute(sql_string)
+        self.myConnection.commit()
+        check_all_sites(DATABASE_SETTINGS, LOG_SETTINGS, TWITTER_SETTINGS)
+        # At this stage, a tweet should have been posted.
+        # We pause for a few seconds before trying to retreive the tweet, just to make sure it is in Twitter's database
+        time.sleep(2)
+        key = TWITTER_SETTINGS['twitter_access_token']
+        secret = TWITTER_SETTINGS['twitter_access_token_secret']
+        consumer_key = TWITTER_SETTINGS['twitter_consumer_key']
+        consumer_secret = TWITTER_SETTINGS['twitter_consumer_secret']
+        t = Twitter(
+            auth=OAuth(
+                key, secret, consumer_key, consumer_secret
+            )
+        )
+        tweets = t.statuses.home_timeline(count=5)
+        combined_tweet_text = ''
+        for tweet in tweets:
+            combined_tweet_text += tweet['text']
+        print("combined_tweet_text is ", combined_tweet_text)
+        target_string = "http://example.example.nothing is offline"
+        self.assertTrue(target_string in combined_tweet_text)
+
         # The program sends a tweet saying that cleanshooz.xyz appears to be unreachable.
-        # Included in the tweet is the time it was tried and the IP it was tried from. The
-        # tweet mentions the person/organisation who is responsible for it.
+        # The tweet mentions the person/organisation who is responsible for it.
+
+    def test_tweet_unavailable_site(self):
+        self.fail("Finish the tests")
+
+    def test_tweet_problem_site_back_online(self):
+        self.fail("Finish the tests")
 
     def test_available_site(self):
         # The second item on the list, gorrog.org was due to be checked some time ago.

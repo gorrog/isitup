@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import requests
-import oauth2 as oauth
 import urllib
 # import flask
 import psycopg2
 import logging
 import logging.handlers
 import datetime
+from twitter import *
 
 from site_checker.settings import (
     DATABASE_SETTINGS,
@@ -75,7 +75,7 @@ def check_all_sites(
                 add_error(my_connection, site_id, status_code, current_date_time)
                 if last_status < 399:
                    # The status of this site has changed from being up to now showing an error. We should tweet about this.
-                   pass
+                   tweet_error(url, status_code, twitter_settings)
             elif status_code <= 399 and last_status > 399:
                 # This means there previously was an error, but now things are OK. We should tweet about this.
                 pass
@@ -174,30 +174,27 @@ def add_error(my_connection, site_id, status_code, current_date_time):
     cur.execute(sql_string, data)
     my_connection.commit()
 
-def tweet_error(url, status_code, oauth_data):
-    key = oauth_data['twitter_access_token']
-    secret = oauth_data['twitter_access_token_secret']
-    consumer_key = oauth_data['twitter_consumer_key']
-    consumer_secret = oauth_data['twitter_consumer_secret']
+def tweet_error(url, status_code, twitter_settings):
+    key = twitter_settings['twitter_access_token']
+    secret = twitter_settings['twitter_access_token_secret']
+    consumer_key = twitter_settings['twitter_consumer_key']
+    consumer_secret = twitter_settings['twitter_consumer_secret']
 
-    token = oauth.Token(key, secret)
-    consumer = oath.Consumer(consumer_key, consumer_secret)
-
-    client = oauth.Client(consumer, token)
-
-    request_url = "https://api.twitter.com/1.1/statuses/update.json"
+    t = Twitter(
+        auth=OAuth(
+            key, secret, consumer_key, consumer_secret
+        )
+    )
 
     if status_code == 999:
-        status_text = "{} appears to be offline. We'll monitor it and tweet when it comes back online again."
+        status_text = "{} is offline. We'll monitor and tweet when it's back online again."
         status_text = status_text.format(url)
     elif status_code > 399:
-        status_text = "There's something wrong with {}. It is returning a {} error and may not be available. We'll monitor it and tweet when it comes back online again."
+        status_text = "Something's wrong with {}. It's returning a {} error. We'll monitor and tweet when it's back to normal."
         status_text = status_text.format(url, status_code)
     else:
         raise NotImplementedError("Something has gone wrong: no need to tweet if the status isn't either > 399 or 999")
-
-    parameters = {
-        'status': status_text
-    }
-    resp, content = client.request(request_url, "PUT", urllib.parse.urlencode(parameters))
+    t.statuses.update(
+        status=status_text
+    )
 
