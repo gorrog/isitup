@@ -1,18 +1,13 @@
 # -*- coding: utf-8 -*-
 import requests
+import oauth2 as oauth
 # import flask
 import psycopg2
 import logging
 import logging.handlers
 import datetime
 
-from site_checker.settings import (
-    HOSTNAME,
-    USERNAME,
-    PASSWORD,
-    DATABASE,
-    LOG_FILE
-    )
+from site_checker.settings import SETTINGS
 
 def connect_db(host_name, user_name, password, database):
     try:
@@ -33,7 +28,7 @@ def init():
     my_logger = logging.getLogger()
     my_logger.setLevel(logging.INFO)
     handler = logging.handlers.RotatingFileHandler(
-                  LOG_FILE, maxBytes=100000, backupCount=4)
+                  SETTINGS['log_file'], maxBytes=100000, backupCount=4)
     my_logger.addHandler(handler)
 
     my_logger.info("Started at {}".format(datetime.datetime.now()))
@@ -44,8 +39,7 @@ def finish():
     my_logger = logging.getLogger()
     my_logger.info("Finished at {}".format(datetime.datetime.now()))
 
-def check_all_sites(host_name = HOSTNAME, user_name = USERNAME,
-                password = PASSWORD, database = DATABASE):
+def check_all_sites(settings=SETTINGS):
     '''
     Checks the list of sites in the database and updates the database according
     to each site's availability
@@ -53,7 +47,7 @@ def check_all_sites(host_name = HOSTNAME, user_name = USERNAME,
     # Get the list of sites to check
     init()
 
-    my_connection = connect_db(host_name, user_name, password, database)
+    my_connection = connect_db(settings['host_name'], settings['user_name'], settings['password'], settings['database'])
     sites_list = get_sites(my_connection)
     # For each site:
     for site_data in sites_list:
@@ -164,5 +158,11 @@ def add_error(my_connection, site_id, status_code, current_date_time):
     data = (site_id, current_date_time, status_code)
     cur.execute(sql_string, data)
     my_connection.commit()
+
+def tweet(url, status_code, oauth_data):
+    secret = "twitter consumer secret"
+    request_token_url = "some url"
+    client = oauth.Client(consumer)
+    resp, content = client.request(request_token_url, "PUT")
 
 

@@ -8,12 +8,7 @@ import datetime
 import logging
 from testfixtures import LogCapture
 
-from test_settings import (
-    HOSTNAME,
-    USERNAME,
-    PASSWORD,
-    DATABASE
-    )
+from test_settings import SETTINGS
 
 # TODO: Reformat all lines to not go over column 79
 
@@ -22,8 +17,13 @@ class SiteCheckerTest(unittest.TestCase):
     # site_checker.py to run every 5 minutes, it is launched
 
     def setUp(self):
-        self.myConnection = psycopg2.connect( host=HOSTNAME, user=USERNAME,
-        password=PASSWORD, dbname=DATABASE )
+        self.myConnection = psycopg2.connect(
+            host=SETTINGS['host_name'],
+            user=SETTINGS['user_name'],
+            password=SETTINGS['password'],
+            dbname=SETTINGS['database']
+        )
+        print(SETTINGS)
         self.initialise_database()
 
     def tearDown(self):
@@ -40,7 +40,9 @@ class SiteCheckerTest(unittest.TestCase):
         "Could not connect to the database! Aborting"):
             with LogCapture(level = logging.ERROR) as l:
                 # We pass the check_site() function bad conneciton data
-                check_all_sites(password = 'BadPassword')
+                temp_settings = dict(SETTINGS)
+                temp_settings['password']='BadPassword'
+                check_all_sites(temp_settings)
                 l.check(
                  ('root', 'ERROR', "Can't connect to database. Exiting.")
                 )
@@ -70,7 +72,7 @@ class SiteCheckerTest(unittest.TestCase):
         self.myConnection.commit()
         # run the test function with our test database. Other credentials are the
         # same
-        check_all_sites(database = DATABASE)
+        check_all_sites(SETTINGS)
         sql_string = """
             SELECT
                 site_id,
@@ -130,7 +132,7 @@ class SiteCheckerTest(unittest.TestCase):
         self.myConnection.commit()
         # run the test function with our test database. Other credentials are the
         # same
-        check_all_sites(database = DATABASE)
+        check_all_sites(SETTINGS)
         sql_string = """
             SELECT
                 site_id,
@@ -192,7 +194,7 @@ class SiteCheckerTest(unittest.TestCase):
         cur = self.myConnection.cursor()
         cur.execute(sql_string)
         self.myConnection.commit()
-        check_all_sites(database = DATABASE)
+        check_all_sites(SETTINGS)
         sql_string = """
             SELECT
             last_checked,
