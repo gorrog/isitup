@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 import requests
 import oauth2 as oauth
+import urllib
 # import flask
 import psycopg2
 import logging
 import logging.handlers
 import datetime
 
-from site_checker.settings import SETTINGS
-
+from site_checker.settings import (
+    DATABASE_SETTINGS,
+    LOG_SETTINGS,
+    TWITTER_SETTINGS
+)
 def connect_db(host_name, user_name, password, database):
     try:
         myConnection = psycopg2.connect(host = host_name, user = user_name,
@@ -28,7 +32,7 @@ def init():
     my_logger = logging.getLogger()
     my_logger.setLevel(logging.INFO)
     handler = logging.handlers.RotatingFileHandler(
-                  SETTINGS['log_file'], maxBytes=100000, backupCount=4)
+                  LOG_SETTINGS['log_file'], maxBytes=100000, backupCount=4)
     my_logger.addHandler(handler)
 
     my_logger.info("Started at {}".format(datetime.datetime.now()))
@@ -39,7 +43,11 @@ def finish():
     my_logger = logging.getLogger()
     my_logger.info("Finished at {}".format(datetime.datetime.now()))
 
-def check_all_sites(settings=SETTINGS):
+def check_all_sites(
+    database_settings=DATABASE_SETTINGS,
+    log_settings=LOG_SETTINGS,
+    twitter_settings=TWITTER_SETTINGS
+    ):
     '''
     Checks the list of sites in the database and updates the database according
     to each site's availability
@@ -47,7 +55,7 @@ def check_all_sites(settings=SETTINGS):
     # Get the list of sites to check
     init()
 
-    my_connection = connect_db(settings['host_name'], settings['user_name'], settings['password'], settings['database'])
+    my_connection = connect_db(database_settings['host_name'], database_settings['user_name'], database_settings['password'], database_settings['database'])
     sites_list = get_sites(my_connection)
     # For each site:
     for site_data in sites_list:
@@ -62,8 +70,15 @@ def check_all_sites(settings=SETTINGS):
             current_date_time = datetime.datetime.now(last_checked.tzinfo)
             update_site(my_connection, site_id, status_code, current_date_time)
             # If there was an error add a new record to the error table.
+            last_status = site_data[3]
             if status_code > 399:
                 add_error(my_connection, site_id, status_code, current_date_time)
+                if last_status < 399:
+                   # The status of this site has changed from being up to now showing an error. We should tweet about this.
+                   pass
+            elif status_code <= 399 and last_status > 399:
+                # This means there previously was an error, but now things are OK. We should tweet about this.
+                pass
         else:
             pass
     finish()
@@ -159,10 +174,30 @@ def add_error(my_connection, site_id, status_code, current_date_time):
     cur.execute(sql_string, data)
     my_connection.commit()
 
-def tweet(url, status_code, oauth_data):
-    secret = "twitter consumer secret"
-    request_token_url = "some url"
-    client = oauth.Client(consumer)
-    resp, content = client.request(request_token_url, "PUT")
+def tweet_error(url, status_code, oauth_data):
+    key = oauth_data['twitter_access_token']
+    secret = oauth_data['twitter_access_token_secret']
+    consumer_key = oauth_data['twitter_consumer_key']
+    consumer_secret = oauth_data['twitter_consumer_secret']
 
+    token = oauth.Token(key, secret)
+    consumer = oath.Consumer(consumer_key, consumer_secret)
+
+    client = oauth.Client(consumer, token)
+
+    request_url = "https://api.twitter.com/1.1/statuses/update.json"
+
+    if status_code == 999:
+        status_text = "{} appears to be offline. We'll monitor it and tweet when it comes back online again."
+        status_text = status_text.format(url)
+    elif status_code > 399:
+        status_text = "There's something wrong with {}. It is returning a {} error and may not be available. We'll monitor it and tweet when it comes back online again."
+        status_text = status_text.format(url, status_code)
+    else:
+        raise NotImplementedError("Something has gone wrong: no need to tweet if the status isn't either > 399 or 999")
+
+    parameters = {
+        'status': status_text
+    }
+    resp, content = client.request(request_url, "PUT", urllib.parse.urlencode(parameters))
 

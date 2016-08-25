@@ -8,8 +8,11 @@ import datetime
 import logging
 from testfixtures import LogCapture
 
-from test_settings import SETTINGS
-
+from test_settings import (
+    DATABASE_SETTINGS,
+    LOG_SETTINGS,
+    TWITTER_SETTINGS
+)
 # TODO: Reformat all lines to not go over column 79
 
 class SiteCheckerTest(unittest.TestCase):
@@ -18,12 +21,11 @@ class SiteCheckerTest(unittest.TestCase):
 
     def setUp(self):
         self.myConnection = psycopg2.connect(
-            host=SETTINGS['host_name'],
-            user=SETTINGS['user_name'],
-            password=SETTINGS['password'],
-            dbname=SETTINGS['database']
+            host=DATABASE_SETTINGS['host_name'],
+            user=DATABASE_SETTINGS['user_name'],
+            password=DATABASE_SETTINGS['password'],
+            dbname=DATABASE_SETTINGS['database']
         )
-        print(SETTINGS)
         self.initialise_database()
 
     def tearDown(self):
@@ -40,9 +42,9 @@ class SiteCheckerTest(unittest.TestCase):
         "Could not connect to the database! Aborting"):
             with LogCapture(level = logging.ERROR) as l:
                 # We pass the check_site() function bad conneciton data
-                temp_settings = dict(SETTINGS)
-                temp_settings['password']='BadPassword'
-                check_all_sites(temp_settings)
+                temp_database_settings = dict(DATABASE_SETTINGS)
+                temp_database_settings['password']='BadPassword'
+                check_all_sites(temp_database_settings, LOG_SETTINGS, TWITTER_SETTINGS)
                 l.check(
                  ('root', 'ERROR', "Can't connect to database. Exiting.")
                 )
@@ -72,7 +74,7 @@ class SiteCheckerTest(unittest.TestCase):
         self.myConnection.commit()
         # run the test function with our test database. Other credentials are the
         # same
-        check_all_sites(SETTINGS)
+        check_all_sites(DATABASE_SETTINGS, LOG_SETTINGS, TWITTER_SETTINGS)
         sql_string = """
             SELECT
                 site_id,
@@ -132,7 +134,7 @@ class SiteCheckerTest(unittest.TestCase):
         self.myConnection.commit()
         # run the test function with our test database. Other credentials are the
         # same
-        check_all_sites(SETTINGS)
+        check_all_sites(DATABASE_SETTINGS, LOG_SETTINGS, TWITTER_SETTINGS)
         sql_string = """
             SELECT
                 site_id,
@@ -194,7 +196,7 @@ class SiteCheckerTest(unittest.TestCase):
         cur = self.myConnection.cursor()
         cur.execute(sql_string)
         self.myConnection.commit()
-        check_all_sites(SETTINGS)
+        check_all_sites(DATABASE_SETTINGS, LOG_SETTINGS, TWITTER_SETTINGS)
         sql_string = """
             SELECT
             last_checked,
@@ -216,10 +218,47 @@ class SiteCheckerTest(unittest.TestCase):
         self.assertEqual(returned_status, 200)
 
     def test_site_not_yet_due(self):
-        self.fail("Finish the tests")
-        # The third item on the list, www.hgjdksl.wo is only due to be checked in 3 minutes,
+        # The third item on the list is only due to be checked in 3 minutes,
         # so no action is taken.
-        # All the other items on the list are only due in the future, so the script closes.
+        sql_string = """
+            INSERT
+            INTO
+            site
+            (
+            url,
+            schedule,
+            last_checked,
+            last_status
+            )
+            VALUES
+            (
+            'http://gorrog.org/boobooboo',
+            '30 minutes',
+            '2116-08-20 12:15:03.946442+00',
+            200
+            )
+        """
+        cur = self.myConnection.cursor()
+        cur.execute(sql_string)
+        self.myConnection.commit()
+        check_all_sites(DATABASE_SETTINGS, LOG_SETTINGS, TWITTER_SETTINGS)
+        sql_string = """
+            SELECT
+            last_checked,
+            last_status
+            FROM
+            site
+            WHERE
+            url = 'http://gorrog.org/boobooboo'
+        """
+        cur = self.myConnection.cursor()
+        cur.execute(sql_string)
+        results = cur.fetchall()
+        returned_time = results[0][0]
+        returned_status = results[0][1]
+        print("str(returned_time) is ", str(returned_time))
+        self.assertTrue(str(returned_time) == '2116-08-20 12:15:03.946442+00:00')
+        self.assertEqual(returned_status, 200)
 
     def initialise_database(self):
         # Initialise test database
