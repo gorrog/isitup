@@ -177,6 +177,7 @@ class SiteCheckerTest(unittest.TestCase):
             site
             (
             url,
+            site_name,
             schedule,
             last_checked,
             last_status
@@ -184,6 +185,7 @@ class SiteCheckerTest(unittest.TestCase):
             VALUES
             (
             'http://example.example.nothing',
+            'Example for Test',
             '30 minutes',
             '2016-08-20 12:15:03.946442+00',
             200
@@ -220,6 +222,7 @@ class SiteCheckerTest(unittest.TestCase):
             site
             (
             url,
+            site_name,
             schedule,
             last_checked,
             last_status
@@ -227,6 +230,7 @@ class SiteCheckerTest(unittest.TestCase):
             VALUES
             (
             'http://gorrog.org',
+            'Gorrog.org',
             '30 minutes',
             '2016-08-20 12:15:03.946442+00',
             404
@@ -260,6 +264,7 @@ class SiteCheckerTest(unittest.TestCase):
             site
             (
             url,
+            site_name,
             schedule,
             last_checked,
             last_status
@@ -267,9 +272,10 @@ class SiteCheckerTest(unittest.TestCase):
             VALUES
             (
             'http://gorrog.org/this_is_a_super_long_url_that_will_need_to_be_shortened_in_some_way_in_order_for_it_to_be_posted_to_twitter_otherwise_this_whole_service_will_fail/hereisevenmorestuff.Areweover140charactersyetImsureweare',
+            'Testing extremely long website name',
             '30 minutes',
             '2016-08-20 12:15:03.946442+00',
-            404
+            200
             )
         """
         cur = self.myConnection.cursor()
