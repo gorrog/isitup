@@ -15,7 +15,8 @@ TABLE
 site (
 id SERIAL UNIQUE PRIMARY KEY,
 url text UNIQUE,
-site_name varchar(50),
+site_name varchar(30),
+responsible_account varchar (50),
 schedule interval,
 last_status smallint,
 first_checked timestamptz DEFAULT CURRENT_TIMESTAMP,

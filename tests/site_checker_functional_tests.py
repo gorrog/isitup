@@ -178,6 +178,7 @@ class SiteCheckerTest(unittest.TestCase):
             (
             url,
             site_name,
+            responsible_account,
             schedule,
             last_checked,
             last_status
@@ -186,6 +187,7 @@ class SiteCheckerTest(unittest.TestCase):
             (
             'http://example.example.nothing',
             'Example for Test',
+            'IsItUpZA',
             '30 minutes',
             '2016-08-20 12:15:03.946442+00',
             200
@@ -209,7 +211,7 @@ class SiteCheckerTest(unittest.TestCase):
         )
         tweets = t.statuses.home_timeline(count=1)
         print("latest tweet is ", tweets[0]['text'])
-        target_string = "http://example.example.nothing is offline"
+        target_string = "Example for Test at"
         self.assertTrue(target_string in tweets[0]['text'])
 
         # The program sends a tweet saying that cleanshooz.xyz appears to be unreachable.
@@ -230,7 +232,7 @@ class SiteCheckerTest(unittest.TestCase):
             VALUES
             (
             'http://gorrog.org',
-            'Gorrog.org',
+            'Gorrog personal',
             '30 minutes',
             '2016-08-20 12:15:03.946442+00',
             404
@@ -254,7 +256,7 @@ class SiteCheckerTest(unittest.TestCase):
         )
         tweets = t.statuses.home_timeline(count=1)
         print("latest tweet is ", tweets[0]['text'])
-        target_string = "Good news!"
+        target_string = "Good news! The Gorrog personal site"
         self.assertTrue(target_string in tweets[0]['text'])
 
     def test_tweet_unavailable_site_very_long_url(self):
@@ -272,7 +274,7 @@ class SiteCheckerTest(unittest.TestCase):
             VALUES
             (
             'http://gorrog.org/this_is_a_super_long_url_that_will_need_to_be_shortened_in_some_way_in_order_for_it_to_be_posted_to_twitter_otherwise_this_whole_service_will_fail/hereisevenmorestuff.Areweover140charactersyetImsureweare',
-            'Testing extremely long website name',
+            'Testing extremely long website',
             '30 minutes',
             '2016-08-20 12:15:03.946442+00',
             200
@@ -296,7 +298,7 @@ class SiteCheckerTest(unittest.TestCase):
         )
         tweets = t.statuses.home_timeline(count=1)
         print("latest tweet is ", tweets[0]['text'])
-        target_string = "Something's wrong"
+        target_string = "is returning a 404 error"
         self.assertTrue(target_string in tweets[0]['text'])
 
     def test_available_site(self):

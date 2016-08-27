@@ -55,7 +55,7 @@ def check_all_sites(
     '''
     # Get the list of sites to check
     init()
-    delete_all_tweets(twitter_settings)
+    # delete_all_tweets(twitter_settings)
     my_connection = connect_db(database_settings['host_name'], database_settings['user_name'], database_settings['password'], database_settings['database'])
     sites_list = get_sites(my_connection)
     # For each site:
@@ -73,16 +73,15 @@ def check_all_sites(
             # If there was an error add a new record to the error table.
             last_status = site_data[3]
             site_name = site_data[5]
+            responsible_account = site_data[6]
             if status_code > 399:
                 add_error(my_connection, site_id, status_code, current_date_time)
                 if last_status < 399:
                    # The status of this site has changed from being up to now showing an error. We should tweet about this.
-                   tweet_error(url, site_name, status_code, twitter_settings)
+                   tweet_error(url, site_name, status_code, responsible_account, twitter_settings)
             elif status_code <= 399 and last_status > 399:
                 # This means there previously was an error, but now things are OK. We should tweet about this.
-                pass
-        else:
-            pass
+                tweet_site_back_online(url, site_name, responsible_account, twitter_settings)
     finish()
 
 def get_sites(my_connection):
@@ -96,7 +95,8 @@ def get_sites(my_connection):
             schedule,
             last_status,
             last_checked,
-            site_name
+            site_name,
+            responsible_account
         FROM
         site;
     """
@@ -177,7 +177,7 @@ def add_error(my_connection, site_id, status_code, current_date_time):
     cur.execute(sql_string, data)
     my_connection.commit()
 
-def tweet_error(url, site_name, status_code, twitter_settings):
+def tweet_error(url, site_name, status_code, responsible_account,  twitter_settings):
     key = twitter_settings['twitter_access_token']
     secret = twitter_settings['twitter_access_token_secret']
     consumer_key = twitter_settings['twitter_consumer_key']
@@ -189,17 +189,37 @@ def tweet_error(url, site_name, status_code, twitter_settings):
         )
     )
 
+    status_text = ''
+    if responsible_account:
+        status_text += '@{}: '.format(responsible_account)
     if status_code == 999:
-        status_text = "{} ({}) is offline. We'll monitor and tweet when it's back online again."
-        status_text = status_text.format(url, site_name)
+        status_text += "{} at {} is offline. We'll monitor and tweet when it's back online again."
+        status_text = status_text.format(site_name, url)
     elif status_code > 399:
-        status_text = "Something's wrong with {} ({}). It's returning a {} error. We'll monitor and tweet when it's back to normal."
-        status_text = status_text.format(url, site_name, status_code)
+        status_text += "The {} site ({}) is returning a {} error. We'll tweet when it's back to normal."
+        status_text = status_text.format(site_name,url, status_code)
     else:
         raise NotImplementedError("Something has gone wrong: no need to tweet if the status isn't either > 399 or 999")
-    t.statuses.update(
-        status=status_text
+    t.statuses.update(status=status_text)
+
+def tweet_site_back_online(url, site_name, responsible_account,  twitter_settings):
+    key = twitter_settings['twitter_access_token']
+    secret = twitter_settings['twitter_access_token_secret']
+    consumer_key = twitter_settings['twitter_consumer_key']
+    consumer_secret = twitter_settings['twitter_consumer_secret']
+
+    t = Twitter(
+        auth=OAuth(
+            key, secret, consumer_key, consumer_secret
+        )
     )
+
+    status_text = ''
+    if responsible_account:
+        status_text += '@{}: '.format(responsible_account)
+    status_text += "Good news! The {} site ({}) is back online."
+    status_text = status_text.format(site_name,url)
+    t.statuses.update(status=status_text)
 
 def delete_all_tweets(twitter_settings):
     key = twitter_settings['twitter_access_token']
@@ -212,7 +232,6 @@ def delete_all_tweets(twitter_settings):
             key, secret, consumer_key, consumer_secret
         )
     )
-    
     tweets = t.statuses.home_timeline(count=10)
     for tweet in tweets:
         id = tweet['id']
