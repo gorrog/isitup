@@ -1,14 +1,24 @@
 from selenium import webdriver
+import unittest
+# from django.contrib.auth.models import User
 
-browser = webdriver.Firefox()
-
-browser.get('http://localhost:8000')
-assert 'Django' in browser.title
-
-
-# Arnold Admin wants to add a new site to the site checker program list
-# He navigates to the site checker site and is presented with a login
-# screen.
+class AdminTest(unittest.TestCase):
+    
+    def setUp(self):
+        self.browser = webdriver.Firefox()
+        
+    def tearDown(self):
+        self.browser.quit()
+        
+    def test_login(self):
+        # Arnold Admin wants to add a new site to the site checker program list
+        # He navigates to the site checker site and is presented with a login
+        # screen.
+        self.browser.get('http://localhost:8000')
+        self.assertIn('Login', self.browser.title)
+        
+        self.fail('Finish the Test!')
+    
 
 # He enters his uername and password
 # He sees that there is a list of sites that are currently being monitored
@@ -54,3 +64,5 @@ assert 'Django' in browser.title
 # he can see that it is no longer present in the list.
 
 
+if __name__ == '__main__':
+    unittest.main(warnings='ignore')
