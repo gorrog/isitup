@@ -58,7 +58,7 @@ class SiteCheckerTest(unittest.TestCase):
         sql_string = """
             INSERT
             INTO
-            site
+            interface_site
             (
             url,
             schedule,
@@ -86,7 +86,7 @@ class SiteCheckerTest(unittest.TestCase):
                 error_code
 
             from
-            error;
+            interface_error;
         """
         cur = self.myConnection.cursor()
         cur.execute(sql_string)
@@ -118,7 +118,7 @@ class SiteCheckerTest(unittest.TestCase):
         sql_string = """
             INSERT
             INTO
-            site
+            interface_site
             (
             url,
             schedule,
@@ -146,7 +146,7 @@ class SiteCheckerTest(unittest.TestCase):
                 error_code
 
             from
-            error;
+            interface_error;
         """
         cur = self.myConnection.cursor()
         cur.execute(sql_string)
@@ -174,7 +174,7 @@ class SiteCheckerTest(unittest.TestCase):
         sql_string = """
             INSERT
             INTO
-            site
+            interface_site
             (
             url,
             site_name,
@@ -221,7 +221,7 @@ class SiteCheckerTest(unittest.TestCase):
         sql_string = """
             INSERT
             INTO
-            site
+            interface_site
             (
             url,
             site_name,
@@ -263,7 +263,7 @@ class SiteCheckerTest(unittest.TestCase):
         sql_string = """
             INSERT
             INTO
-            site
+            interface_site
             (
             url,
             site_name,
@@ -307,7 +307,7 @@ class SiteCheckerTest(unittest.TestCase):
         sql_string = """
             INSERT
             INTO
-            site
+            interface_site
             (
             url,
             schedule,
@@ -331,7 +331,7 @@ class SiteCheckerTest(unittest.TestCase):
             last_checked,
             last_status
             FROM
-            site
+            interface_site
             WHERE
             url = 'http://gorrog.org'
         """
@@ -352,7 +352,7 @@ class SiteCheckerTest(unittest.TestCase):
         sql_string = """
             INSERT
             INTO
-            site
+            interface_site
             (
             url,
             schedule,
@@ -376,7 +376,7 @@ class SiteCheckerTest(unittest.TestCase):
             last_checked,
             last_status
             FROM
-            site
+            interface_site
             WHERE
             url = 'http://gorrog.org/boobooboo'
         """

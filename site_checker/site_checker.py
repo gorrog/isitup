@@ -98,7 +98,7 @@ def get_sites(my_connection):
             site_name,
             responsible_account
         FROM
-        site;
+        interface_site;
     """
     cur = my_connection.cursor()
     cur.execute(sql_string)
@@ -139,7 +139,7 @@ def update_site(my_connection, id, status_code, current_date_time):
     '''
     sql_string="""
         UPDATE
-        site
+        interface_site
         SET
         last_status = %s,
         last_checked = %s
@@ -159,7 +159,7 @@ def add_error(my_connection, site_id, status_code, current_date_time):
     sql_string="""
         INSERT
         INTO
-        error
+        interface_error
         (
         site_id,
         error_timestamp,
