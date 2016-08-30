@@ -9,7 +9,7 @@ import datetime
 from twitter import *
 import time
 
-from site_checker.settings import (
+from tests.test_settings import  (
     DATABASE_SETTINGS,
     LOG_SETTINGS,
     TWITTER_SETTINGS
@@ -53,6 +53,7 @@ def check_all_sites(
     Checks the list of sites in the database and updates the database according
     to each site's availability
     '''
+    #import pdb; pdb.set_trace()
     # Get the list of sites to check
     init()
     # delete_all_tweets(twitter_settings)
@@ -237,3 +238,6 @@ def delete_all_tweets(twitter_settings):
         id = tweet['id']
         time.sleep(2)
         t.statuses.destroy(_id=id)
+
+if __name__ == '__main__':
+    check_all_sites()

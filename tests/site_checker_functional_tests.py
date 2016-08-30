@@ -62,15 +62,19 @@ class SiteCheckerTest(unittest.TestCase):
             (
             url,
             schedule,
+            first_checked,
             last_checked,
-            last_status
+            last_status,
+            site_name
             )
             VALUES
             (
             'http://gorrog.gorrog.poop',
             '30 minutes',
             '2016-08-20 12:15:03.946442+00',
-            200
+            '2016-08-20 12:15:03.946442+00',
+            200,
+            'Gorrog poop'
             )
         """
         cur = self.myConnection.cursor()
@@ -96,7 +100,17 @@ class SiteCheckerTest(unittest.TestCase):
         site_id = results[0][0]
         error_timestamp = results[0][1]
         error_code = results[0][2]
-        self.assertEqual(site_id, 1)
+        sql_string = """ 
+            SELECT 
+            id
+            FROM 
+            interface_site
+            WHERE
+            url = 'http://gorrog.gorrog.poop'
+        """
+        cur.execute(sql_string)
+        results_2 = cur.fetchall()
+        self.assertEqual(site_id, results_2[0][0])
         current_date_time = datetime.datetime.now(tz=error_timestamp.tzinfo)
         self.assertTrue(current_date_time - error_timestamp < datetime.timedelta(seconds=60))
         self.assertEqual(error_code, 999)
@@ -122,15 +136,19 @@ class SiteCheckerTest(unittest.TestCase):
             (
             url,
             schedule,
+            first_checked,
             last_checked,
-            last_status
+            last_status,
+            site_name
             )
             VALUES
             (
             'http://gorrog.org/blah',
             '30 minutes',
             '2016-08-20 12:15:03.946442+00',
-            200
+            '2016-08-20 12:15:03.946442+00',
+            200,
+            'Gorrog blah'
             )
         """
         cur = self.myConnection.cursor()
@@ -148,7 +166,6 @@ class SiteCheckerTest(unittest.TestCase):
             from
             interface_error;
         """
-        cur = self.myConnection.cursor()
         cur.execute(sql_string)
         results = cur.fetchall()
         if not results:
@@ -156,7 +173,19 @@ class SiteCheckerTest(unittest.TestCase):
         site_id = results[0][0]
         error_timestamp = results[0][1]
         error_code = results[0][2]
-        self.assertEqual(site_id,1)
+        # We now find the id of the site that we previously inserted
+        sql_string = """
+            SELECT
+            id
+            FROM
+            interface_site
+            WHERE
+            url = 'http://gorrog.org/blah'
+        """
+        cur = self.myConnection.cursor()
+        cur.execute(sql_string)
+        results_2 = cur.fetchall() 
+        self.assertEqual(site_id, results_2[0][0])
         current_date_time = datetime.datetime.now(tz=error_timestamp.tzinfo)
         self.assertTrue(current_date_time - error_timestamp < datetime.timedelta(seconds=60))
         self.assertEqual(error_code, 404)
@@ -180,6 +209,7 @@ class SiteCheckerTest(unittest.TestCase):
             site_name,
             responsible_account,
             schedule,
+            first_checked,
             last_checked,
             last_status
             )
@@ -189,6 +219,7 @@ class SiteCheckerTest(unittest.TestCase):
             'Example for Test',
             'IsItUpZA',
             '30 minutes',
+            '2016-08-20 12:15:03.946442+00',
             '2016-08-20 12:15:03.946442+00',
             200
             )
@@ -226,6 +257,7 @@ class SiteCheckerTest(unittest.TestCase):
             url,
             site_name,
             schedule,
+            first_checked,
             last_checked,
             last_status
             )
@@ -234,6 +266,7 @@ class SiteCheckerTest(unittest.TestCase):
             'http://gorrog.org',
             'Gorrog personal',
             '30 minutes',
+            '2016-08-20 12:15:03.946442+00',
             '2016-08-20 12:15:03.946442+00',
             404
             )
@@ -269,6 +302,7 @@ class SiteCheckerTest(unittest.TestCase):
             site_name,
             schedule,
             last_checked,
+            first_checked,
             last_status
             )
             VALUES
@@ -276,6 +310,7 @@ class SiteCheckerTest(unittest.TestCase):
             'http://gorrog.org/this_is_a_super_long_url_that_will_need_to_be_shortened_in_some_way_in_order_for_it_to_be_posted_to_twitter_otherwise_this_whole_service_will_fail/hereisevenmorestuff.Areweover140charactersyetImsureweare',
             'Testing extremely long website',
             '30 minutes',
+            '2016-08-20 12:15:03.946442+00',
             '2016-08-20 12:15:03.946442+00',
             200
             )
@@ -311,15 +346,19 @@ class SiteCheckerTest(unittest.TestCase):
             (
             url,
             schedule,
+            first_checked,
             last_checked,
-            last_status
+            last_status,
+            site_name
             )
             VALUES
             (
             'http://gorrog.org',
             '30 minutes',
             '2016-08-20 12:15:03.946442+00',
-            200
+            '2016-08-20 12:15:03.946442+00',
+            200,
+            'gorrog'
             )
         """
         cur = self.myConnection.cursor()
@@ -357,14 +396,18 @@ class SiteCheckerTest(unittest.TestCase):
             url,
             schedule,
             last_checked,
-            last_status
+            last_status,
+            site_name,
+            first_checked
             )
             VALUES
             (
             'http://gorrog.org/boobooboo',
             '30 minutes',
             '2116-08-20 12:15:03.946442+00',
-            200
+            200,
+            'Gorrog booboo',
+            '2116-08-20 12:15:03.946442+00'
             )
         """
         cur = self.myConnection.cursor()
@@ -391,7 +434,7 @@ class SiteCheckerTest(unittest.TestCase):
 
     def initialise_database(self):
         # Initialise test database
-        file_path=os.path.normpath(os.path.join(os.getcwd(),'site_checker','is_it_up_schema.sql'))
+        file_path=os.path.normpath(os.path.join(os.getcwd(),'tests','clear_tables.sql'))
         with open(file_path, 'r') as f:
             sql_query = f.read()
         cur = self.myConnection.cursor()
