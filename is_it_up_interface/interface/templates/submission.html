@@ -1,0 +1,7 @@
+<h1>Form for Website Submission</h1>
+
+<form action="/submit/" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit" />
+</form>
