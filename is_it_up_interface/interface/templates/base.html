@@ -1,9 +1,11 @@
 <html lang="en-GB">
     <head>
         <meta charset = "utf-8" >
+        {% block title %}
         <title>
             IsItUpZA - A Website Monitor for Essential South African Digital Services
         </title>
+        {% endblock %}
         <link rel="stylesheet" href="base.css" />
         <meta name="author" content="Landon Simmons and Roger Gordon" >
         <meta name="description" content="A website monitor for keeping track of essential South African digital services. We display a lit of sites that are offline, showing errors, or are healthy. You can also submit a site for us to add to our monitoring list. See our twitter feed, @IsItUpZA" >
@@ -11,6 +13,29 @@
     </head>
 
     <body>
+
+        <nav>
+            <ul>
+                <li>
+                    <a href="/" title="home">
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="admin" title="Administration Section">
+                        Admin
+                    </a>
+                </li>
+                <li>
+                    <a href="submit" title="Submit a website for monitoring">
+                        Submit a Website for Monitoring
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        {% block content %}
+        {% endblock %}
 
     </body>
 </html>
