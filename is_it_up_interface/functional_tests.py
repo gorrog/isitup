@@ -3,66 +3,74 @@ import unittest
 # from django.contrib.auth.models import User
 
 class AdminTest(unittest.TestCase):
-    
     def setUp(self):
         self.browser = webdriver.Firefox()
-        
+
     def tearDown(self):
         self.browser.quit()
-        
+
     def test_login(self):
         # Arnold Admin wants to add a new site to the site checker program list
-        # He navigates to the site checker site and is presented with a login
+        # He navigates to the site checker site
+        self.browser.get('http://localhost:8000/')
+        # He sees a 'login' link on the main page
         # screen.
-        self.browser.get('http://localhost:8000')
-        self.assertIn('Login', self.browser.title)
-        
-        self.fail('Finish the Test!')
-    
+        login_link = self.browser.find_element_by_link_text("Log in")
+        # He clicks the login link
+        login_link.click()
 
-# He enters his uername and password
-# He sees that there is a list of sites that are currently being monitored
+        # He's taken to a login page
+        self.browser.get('http://localhost:8000/')
 
-# He sees that there is a link to add a new site
-# He clicks on the link
+        self.assertIn('Log in', self.browser.title)
+        self.fail('Finish the Tests!')
 
-# He's taken to a page titled 'Add new' with a form inviting him to add
-# details of a new site to be monitored.
+# Arnold enters his username but forgets to enter a password and hits 'Enter'
+# The page refreshes and alerts him that either his username or password were incorrect
 
-# He tries to fill in the required fieds and clicks submit
-# However, he fogets to put in the site URL.
+# Arnold enters his password but forgets to enter a username and hits 'Enter'
+# The page refreshes and alerts him that either his username or password were incorrect
 
-# The page refreshes after submitting and an error is shown alerting him to
-# his omission of the required URL field.
+# Arnold stupidly thinks that a blank password and username will get him in.
+# The page refreshes and alerts him that either his username or password were incorrect
 
-# He fills it in correctly this time and hits submit.
-# The page refreshes and he is taken back to the list of sites. A message at
-# the top of the screen advises him that his new entry has been added.
+# Arnold now recalls that he did in fact register as an Admin a while back. He
+# finds his username and password on a piece of paper and types them both in.
+# Unfortunately, Arnold types his password incorrectly. He hits enter.
+# The page refreshes and alerts him that either his username or password were incorrect
 
-# He can see his new entry listed among the other sites in alphabetical order of
-# site name
+# Arnold realises that he had caps lock on. He fixes this and now enters his password
+# and username correctly. He hits enter.
+# The page takes him to an admin page titled "Site administration"
 
-# Arnold now wants to edit the site he just put in.
+## We don't need to test further as Arnold since this is the Django admin we didn't write.
+## We assume for the sake of sanity and time that this actually works.
 
-# He clicks on the name of the site.
-# The site detail opens up in a new page and he can edit any of the fields
-# he chooses to. This time he decides to change the schedule.
-# He hits submit and is taken back to the list of sites.
-# A message at the top of the screeen informs him that his site has been successfully
-# updated.
+# Ursula User has heard about this site for monitoring South African Government
+# e-services and wants to see if the site she is in charge of is on the list.
 
-# Arnold decides that one of the sites does not need to be monitored any more.
-# He clicks on the site that he wishes to remove and is taken to the detail of that
-# site.
+# She navigates to http://isitupza.gorrog.org
+# She sees that the page title mentions monitoring Government E-Services
 
-# He notices that there is a button that says 'Delete' at the bottom.
-# He clicks the button, and is shown a confirmation screen asking if he really
-# wants to delete the site.
+# She sees that there are 3 lists of sites: Offline, Errors and Healthy.
+# She sees that 'http://postoffice.co.za is in the 'healthy' list.
 
-# He clicks 'Yes' and is taken back to the list of sites.
-# A message at the top of the list informs him that his site has been deleted and
-# he can see that it is no longer present in the list.
+# She looks for http://www.gov.za, but doesn't see it on the list. She wonders
+# if there is a way to submit sites for inclusion in the monitoring list.
 
+# Fortunately, she sees that there is a link for submitting a website
+# She clicks the link
+
+# She is taken to a page with a title mentioning submitting a website.
+# She reads throught the terms and conditions.
+
+# She's happy with the terms and conditions so she starts filling out the form.
+# She fills out the url and hits enter
+
+# The page refreshes, telling her that she must enter a site name as well.
+# She does so and hits enter.
+
+# She is taken to a page thanking her for her submission.
 
 if __name__ == '__main__':
     unittest.main(warnings='ignore')
