@@ -62,10 +62,6 @@ class UserTest(unittest.TestCase):
 
     def test_user_login(self):
         print("now insite the UserTest test class")
-<<<<<<< HEAD
-=======
-        self.fail("Finish the test")
->>>>>>> b973da4234fa5771d22165ad059cc8fd3bc2a866
         # Ursula User has heard about this site for monitoring South African Government
         # e-services and wants to see if the site she is in charge of is on the list.
 
@@ -104,12 +100,10 @@ class UserTest(unittest.TestCase):
         site_name_field.send_keys("Google")
         responsible_account_field.send_keys("Billionaires")
         responsible_account_field.send_keys(Keys.ENTER)        
-   
-
-        # The page refreshes, telling her that she must enter a site name as well.
-        # She does so and hits enter.
-
+    
         # She is taken to a page thanking her for her submission.
-
+        target_string = "Thank You"
+        self.assertIn(target_string, self.browser.title)
+        
 if __name__ == '__main__':
     unittest.main()

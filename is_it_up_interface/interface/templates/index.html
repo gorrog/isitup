@@ -1,15 +1,17 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}
         <title>
             IsItUpZA - A Website Monitor for Essential South African Digital Services
         </title>
 {% endblock %}
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{% static 'interface/index.css' %}" />
+{% endblock %}
 {% block content %}
 <section>
     <h2 id='Offline'> Offline Sites Being Monitored</h2>
-    <p>
-    The following sites are completely offline and cannot be reached by our monitoring application.
-    </p>
+    
     <table border='1'>
         <tr>
             <th>
