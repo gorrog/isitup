@@ -1,0 +1,9 @@
+.~c9*
+is_it_up_interface/interface/migrations
+is_it_up_venv/
+site_checker/settings.py
+tests/test_settings.py
+site_checker/settings.py
+tests/test_settings.py
+site_checker.log
+site_checker_test.log

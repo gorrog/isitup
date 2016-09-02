@@ -1,7 +1,23 @@
-<h1>Form for Website Submission</h1>
+{% extends 'base.html' %}
+{% load static %}
 
+{% block title %}
+        <title>
+           IsItUpZA - Submit a Website
+        </title>
+{% endblock %}
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{% static 'interface/submission.css' %}" />
+{% endblock %}
+
+
+{% block content %}
+<h2>Submit a Website to Monitor</h2>
 <form action="/submit/" method="post">
     {% csrf_token %}
+<table>
     {{ form }}
+</table>
     <input type="submit" value="Submit" />
 </form>
+{% endblock %}

@@ -1,0 +1,17 @@
+form table tr th {
+    margin:  15px 15px;
+}
+
+body {
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+}
+
+table {
+    margin: 1em auto;
+    border-collapse: separate;
+    border-spacing: 10px 50px;
+}

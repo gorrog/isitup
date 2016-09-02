@@ -1,3 +1,4 @@
+{% load static %}
 <html lang="en-GB">
     <head>
         <meta charset = "utf-8" >
@@ -6,15 +7,20 @@
             IsItUpZA - A Website Monitor for Essential South African Digital Services
         </title>
         {% endblock %}
-        <link rel="stylesheet" href="base.css" />
         <meta name="author" content="Landon Simmons and Roger Gordon" >
         <meta name="description" content="A website monitor for keeping track of essential South African digital services. We display a lit of sites that are offline, showing errors, or are healthy. You can also submit a site for us to add to our monitoring list. See our twitter feed, @IsItUpZA" >
         <meta name="keywords" content="South Africa, South African Government, Government, Digital Services, E-Services, Website, Monitor" >
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        {% block style %}
+        {% endblock %}
+        
     </head>
 
     <body>
 
-        <nav>
+        <nav class="navbar nav-pills">
             <ul>
                 <li>
                     <a href="/" title="home">
@@ -33,7 +39,14 @@
                 </li>
             </ul>
         </nav>
-
+        <hgroup>
+            <h1>
+                IsItUpZA
+            </h1>
+            <h2>
+                A Website Monitor for Essential South African Digital Services
+            </h2>
+        </hgroup>
         {% block content %}
         {% endblock %}
 

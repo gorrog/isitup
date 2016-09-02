@@ -5,15 +5,6 @@ from interface.forms import SubmissionForm
 from django.shortcuts import render
 from django.template import loader
 
-# def index(request):
-#     latest_question_list = Question.objects.order_by('-pub_date')[:5]
-#     template = loader.get_template('index.html')
-#     context = {
-#         'latest_question_list': latest_question_list,
-#     }
-    
-#     return HttpResponse(template.render(context, request))
-
 def index(request):
     up_sites_list = Site.objects.filter(last_status__lte = 399)
     down_sites_list = Site.objects.filter(last_status__gt = 399).filter(last_status__lt = 999)
@@ -48,11 +39,3 @@ def submission(request):
 
     return render(request, 'submission.html', {'form': form})
 
-# def detail(request, question_id):
-#     question = get_object_or_404(Question, pk=question_id)
-#     return render(request, 'polls/detail.html', {'question': question})
-    
-# def results(request, question_id):
-#     response = "You're looking at the results of the question %s."
-#     return HttpResponse(response % question_id)
-    
