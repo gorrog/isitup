@@ -13,7 +13,8 @@ class AdminTest(unittest.TestCase):
     def test_login(self):
         # Arnold Admin wants to add a new site to the site checker program list
         # He navigates to the site checker site
-        self.browser.get('http://localhost:8000/')
+        
+        self.browser.get("http://localhost:8000/")
         # He sees an 'admin' link on the main page
         # screen.
         admin_link = self.browser.find_element_by_link_text("Admin")
@@ -34,8 +35,6 @@ class AdminTest(unittest.TestCase):
 
         target_string = "Please enter the correct username and password"
         error_message = self.browser.find_element_by_class_name("errornote")
-        print("target string is {}, and error_message.text() is {}".format(
-            target_string, error_message.text))
         self.assertIn(target_string, error_message.text)
 
         # Arnold realises that he had caps lock on. He fixes this and now enters his password
@@ -62,34 +61,53 @@ class UserTest(unittest.TestCase):
         self.browser.quit()
 
     def test_user_login(self):
+        print("now insite the UserTest test class")
         # Ursula User has heard about this site for monitoring South African Government
         # e-services and wants to see if the site she is in charge of is on the list.
 
         # She navigates to the website's hompage
-        self.browser.get('http://localhost:8000/')
+        self.browser.get("http://localhost:8000/")
         # She sees that the page title mentions monitoring Government E-Services
         target_string = "South African Digital Services"
-        self.fail("Finish the tests")
 
         # She sees that there are 3 lists of sites: Offline, Errors and Healthy.
         # She sees that 'http://postoffice.co.za is in the 'healthy' list.
-
-        # She looks for http://www.gov.za, but doesn't see it on the list. She wonders
+        offline_heading = self.browser.find_element_by_id("Offline")
+        self.assertIn('Offline', offline_heading.text)
+        problem_heading = self.browser.find_element_by_id("Problem")
+        self.assertIn('Problem', problem_heading.text)
+        healthy_heading = self.browser.find_element_by_id("Healthy")
+        self.assertIn('Healthy', healthy_heading.text)
+		# She looks for http://www.gov.za, but doesn't see it on the list. She wonders
         # if there is a way to submit sites for inclusion in the monitoring list.
-
+		
         # Fortunately, she sees that there is a link for submitting a website
+        submit_link = self.browser.find_element_by_link_text("Submit a Website for Monitoring")
         # She clicks the link
-
+        submit_link.click()
+        
         # She is taken to a page with a title mentioning submitting a website.
         # She reads throught the terms and conditions.
-
+        target_string = "Submit"
+        self.assertIn(target_string, self.browser.title)
+        
         # She's happy with the terms and conditions so she starts filling out the form.
         # She fills out the url and hits enter
+        url_field = self.browser.find_element_by_id("id_url")
+        site_name_field = self.browser.find_element_by_id("id_site_name")
+        responsible_account_field = self.browser.find_element_by_id("id_responsible_account")
+        url_field.send_keys("http:/Google.com")
+        site_name_field.send_keys("Google")
+        responsible_account_field.send_keys("Billionaires")
+        responsible_account_field.send_keys(Keys.ENTER)        
+   
 
         # The page refreshes, telling her that she must enter a site name as well.
         # She does so and hits enter.
 
         # She is taken to a page thanking her for her submission.
-
-    if __name__ == '__main__':
-        unittest.main(warnings='ignore')
+        self.fail("Finish the tests")
+		
+		
+if __name__ == '__main__':
+    unittest.main()
