@@ -34,8 +34,6 @@ class AdminTest(unittest.TestCase):
 
         target_string = "Please enter the correct username and password"
         error_message = self.browser.find_element_by_class_name("errornote")
-        print("target string is {}, and error_message.text() is {}".format(
-            target_string, error_message.text))
         self.assertIn(target_string, error_message.text)
 
         # Arnold realises that he had caps lock on. He fixes this and now enters his password
@@ -62,6 +60,8 @@ class UserTest(unittest.TestCase):
         self.browser.quit()
 
     def test_user_login(self):
+        print("now insite the UserTest test class")
+        self.fail("Finish the test")
         # Ursula User has heard about this site for monitoring South African Government
         # e-services and wants to see if the site she is in charge of is on the list.
 
@@ -91,5 +91,5 @@ class UserTest(unittest.TestCase):
 
         # She is taken to a page thanking her for her submission.
 
-    if __name__ == '__main__':
-        unittest.main(warnings='ignore')
+if __name__ == '__main__':
+    unittest.main()
