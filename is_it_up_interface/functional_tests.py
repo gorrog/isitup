@@ -62,6 +62,10 @@ class UserTest(unittest.TestCase):
 
     def test_user_login(self):
         print("now insite the UserTest test class")
+<<<<<<< HEAD
+=======
+        self.fail("Finish the test")
+>>>>>>> b973da4234fa5771d22165ad059cc8fd3bc2a866
         # Ursula User has heard about this site for monitoring South African Government
         # e-services and wants to see if the site she is in charge of is on the list.
 
@@ -106,8 +110,6 @@ class UserTest(unittest.TestCase):
         # She does so and hits enter.
 
         # She is taken to a page thanking her for her submission.
-        self.fail("Finish the tests")
-		
-		
+
 if __name__ == '__main__':
     unittest.main()
