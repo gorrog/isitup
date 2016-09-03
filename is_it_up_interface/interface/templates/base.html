@@ -13,6 +13,7 @@
         <!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href={% static 'interface/base.css' %}>
         {% block style %}
         {% endblock %}
 
@@ -22,7 +23,7 @@
 
         <nav>
             <ul class="navbar nav-pills nav-justified">
-                <li role="presentation" class="active">
+                <li role="presentation">
                     <a href="/" title="home">
                         Home
                     </a>
@@ -39,6 +40,7 @@
                 </li>
             </ul>
         </nav>
+        <img src="{% static 'interface/images/logo.png' %}" width="225px" height="225px" />
         <hgroup>
             <h1>
                 IsItUpZA

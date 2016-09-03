@@ -1,0 +1,41 @@
+nav {
+    background-color: #00774e;
+}
+
+body nav ul li a {
+    font-size: 1.75em;
+    color: #fff;
+    margin-top: 0px;
+}
+
+body nav ul {
+    margin: 0px 0px;
+    border: none;
+    padding: 15px 0px;
+}
+
+td {
+    word-break: break-all;
+}
+
+body {
+    text-align: center;
+}
+
+body nav ul li a:link, a:visited {
+    list-style: none;
+    text-decoration: none;
+    color: #fff;
+}
+
+li a:hover, li a:active {
+    color: #ffb00b;
+}
+
+section {
+    margin-top: 5em;
+}
+
+p {
+   padding: 0.5em 2em;
+}

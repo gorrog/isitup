@@ -25,4 +25,17 @@ table {
     border-collapse: separate;
     border-spacing: 20px;
 }
+section a {
+    color: #e73a32;
+}
 
+section h2 a:hover, section h2 a:active {
+    color: #ffb00b;
+    text-decoration: none;
+}
+
+section a, section a:visited {
+    list-style: none;
+    text-decoration: none;
+    color: green;
+}

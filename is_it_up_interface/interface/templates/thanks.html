@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}
         <title>
             IsItUpZA - Thank You
@@ -8,13 +9,11 @@
 <link rel="stylesheet" type="text/css" href="{% static 'interface/thanks.css' %}" />
 {% endblock %}
 {% block content %}
-<h1>
-Thank you!
-</h1>
-<p>
-Thank you very much for you submission. We will review it and add it to our list of sites to monitor, should we deem it appropriate.
-</p>
-<p>
-Next steps: <a href=../submit/>add another site</a>, or <a href="../">return to the home page</a>.
-</p>
+<section>
+<h2 class="isolate_thanks_links">
+Thank you! Thank you very much for you submission. <br><br>
+Next steps: <a href=../submit/>add another site</a>,
+            or <a href="../">return to the home page</a>.
+</h2>
+</section>
 {% endblock %}

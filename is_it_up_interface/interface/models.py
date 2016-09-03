@@ -1,7 +1,7 @@
 from django.db import models
 
 class Site(models.Model):
-    url = models.CharField(max_length=500)
+    url = models.URLField(max_length=500)
     site_name = models.CharField(max_length=30)
     responsible_account = models.CharField(max_length=50, null=True, blank=True)
     schedule = models.DurationField()
@@ -22,5 +22,6 @@ class Submission(models.Model):
     url = models.URLField(max_length=500)
     site_name = models.CharField(max_length=30)
     responsible_account = models.CharField(max_length=50, null=True, blank=True)
+    submitter_email = models.EmailField(null=True, blank=True)
     def __str__(self):
         return self.site_name

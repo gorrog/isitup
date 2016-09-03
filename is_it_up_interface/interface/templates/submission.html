@@ -13,11 +13,22 @@
 
 {% block content %}
 <!--<h2>A Website Monitor for Essential South African Digital Services, Submit a Website to Monitor</h2>-->
-<form action="/submit/" method="post">
-    {% csrf_token %}
-<table>
-    {{ form }}
-</table>
-    <input type="submit" value="Submit" />
-</form>
+<section>
+    <h2>
+        Add to Our List!
+    </h2
+    <p>
+        If you would like to submit a website to be monitored, please fill in the form below. The 'responsible account' field is the twitter handle (if available) of the person responsible for the website that should be notified if the site experiences problems. If you would like us to contact you regarding your submission, please provide your email address.
+    </p>
+    <p>
+        As this service is focussed on essential South African digital services, please only submit sites that are of interest to the public. Also, note that not every site submitted will be added to the monitoring list. All submissions will be reviewed before being added. Thanks for your participation!
+    </p>
+    <form action="/submit/" method="post">
+        {% csrf_token %}
+    <table>
+        {{ form }}
+    </table>
+        <input type="submit" value="Submit" />
+    </form>
+</section>
 {% endblock %}

@@ -12,22 +12,29 @@
 <section>
     <h2 id='Offline'> Offline Sites Being Monitored</h2>
     
-    <table border='1'>
+    <table border='1' class="bad_table offline">
         <tr>
             <th>
             Site name
             </th>
             <th>
-            URL (website address) to be monitored
+            URL (website address) being monitored
             </th>
+            <th>
+            Last checked
+            </th>
+            
         </tr>
         {% for site in offline_sites_list %}
-        <tr>
+        <tr class="bad_table">
             <td>
             {{ site.site_name }}
             </td>
             <td>
             {{ site.url }}
+            </td>
+            <td>
+            {{ site.last_checked }}
             </td>
         </tr>
         {% endfor %}
@@ -37,20 +44,23 @@
 
 <section>
     <h2 id='Problem'> Problem Sites Being Monitored</h2>
-    <table border='1'>
+    <table border='1' class="bad_table problem">
         <tr>
             <th>
             Site name
             </th>
             <th>
-            URL (website address) to be monitored
+            URL (website address) being monitored
             </th>
             <th>
             Current error
             </th>
+            <th>
+            Last checked
+            </th>
         </tr>
         {% for site in down_sites_list %}
-        <tr>
+        <tr class="bad_table">
             <td>
             {{ site.site_name }}
             </td>
@@ -60,6 +70,9 @@
             <td>
             {{ site.last_status }}
             </td>
+            <td>
+            {{ site.last_checked }}
+            </td>
         </tr>
         {% endfor %}
     </table>
@@ -68,22 +81,28 @@
 
 <section>
     <h2 id='Healthy'> Healthy Sites Being Monitored</h2>
-    <table border='1'>
+    <table border='1' class="bad_table healthy">
         <tr>
             <th>
             Site name
             </th>
             <th>
-            URL (website address) to be monitored
+            URL (website address) being monitored
+            </th>
+            <th>
+            Last checked
             </th>
         </tr>
         {% for site in up_sites_list %}
-        <tr>
+        <tr class="bad_table">
             <td>
             {{ site.site_name }}
             </td>
             <td>
             {{ site.url }}
+            </td>
+            <td>
+            {{ site.last_checked }}
             </td>
         </tr>
         {% endfor %}
