@@ -6,6 +6,7 @@ import unittest
 class AdminTest(unittest.TestCase):
     def setUp(self):
         self.browser = webdriver.Firefox()
+        self.browser.implicitly_wait(3)
 
     def tearDown(self):
         self.browser.quit()
@@ -13,7 +14,7 @@ class AdminTest(unittest.TestCase):
     def test_login(self):
         # Arnold Admin wants to add a new site to the site checker program list
         # He navigates to the site checker site
-        
+
         self.browser.get("http://localhost:8000/")
         # He sees an 'admin' link on the main page
         # screen.
@@ -56,6 +57,7 @@ class AdminTest(unittest.TestCase):
 class UserTest(unittest.TestCase):
     def setUp(self):
         self.browser = webdriver.Firefox()
+        self.browser.implicitly_wait(3)
 
     def tearDown(self):
         self.browser.quit()
@@ -80,30 +82,30 @@ class UserTest(unittest.TestCase):
         self.assertIn('Healthy', healthy_heading.text)
 		# She looks for http://www.gov.za, but doesn't see it on the list. She wonders
         # if there is a way to submit sites for inclusion in the monitoring list.
-		
         # Fortunately, she sees that there is a link for submitting a website
         submit_link = self.browser.find_element_by_link_text("Submit a Website for Monitoring")
         # She clicks the link
         submit_link.click()
-        
+
         # She is taken to a page with a title mentioning submitting a website.
         # She reads throught the terms and conditions.
         target_string = "Submit"
         self.assertIn(target_string, self.browser.title)
-        
+
         # She's happy with the terms and conditions so she starts filling out the form.
         # She fills out the url and hits enter
         url_field = self.browser.find_element_by_id("id_url")
         site_name_field = self.browser.find_element_by_id("id_site_name")
         responsible_account_field = self.browser.find_element_by_id("id_responsible_account")
-        url_field.send_keys("http:/Google.com")
+        url_field.send_keys("http://Google.com")
         site_name_field.send_keys("Google")
         responsible_account_field.send_keys("Billionaires")
-        responsible_account_field.send_keys(Keys.ENTER)        
-    
+        responsible_account_field.send_keys(Keys.ENTER)
+
         # She is taken to a page thanking her for her submission.
         target_string = "Thank You"
-        self.assertIn(target_string, self.browser.title)
-        
+        title = self.browser.title
+        self.assertIn(target_string, title)
+
 if __name__ == '__main__':
     unittest.main()
