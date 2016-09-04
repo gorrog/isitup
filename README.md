@@ -40,12 +40,12 @@ This service consist of 2 parts
   * Sends a tweet to a predefined Twitter account if a site changes status from being healthy to either offline or problem (returning any HTTP status code > `399`).
   * Sends a tweet to a predefined Twitter account if a site changes status from being either offline or problem (returning any HTTP status code > `399`) to healthy again.
   * Written for a PostgreSQL database, but can be adapted to other databases through updating the relevant SQL queries.
-  * Backed by tests located at `site_checker/tests`. Run the tests from the `site_checker` directory with the command `PYTHONPATH=. python site_checker/tests/functional_tests.py` (if you have multiple versions of python installed, change the command from `python` to `python3`.)
+  * Backed by tests located at `site_checker/tests`. Run the tests from the `site_checker` directory with the command `PYTHONPATH=. python tests/functional_tests.py` (if you have multiple versions of python installed, change the command from `python` to `python3`.)
 
 2. A web front end called `is_it_up_interface`.
   * Uses Django 1.10
   * Uses Django's stock Admin interface for interacting with the `interface_site`, `interface_error`, and `interface_submission` (used for user submitted sites tables).
-  * Backed by tests located at `is_it_up_interface\functional_tests.py`. Run them with this command from the project root directory: `python is_it_up_interface\functional_tests.py` (if you have multiple versions of python installed, change the command from `python` to `python3`.)
+  * Backed by tests located at `is_it_up_interface/functional_tests.py`. Run them with this command from the project root directory: `python is_it_up_interface/functional_tests.py` (if you have multiple versions of python installed, change the command from `python` to `python3`.)
     * Note that these tests use Selenium to drive a Firefox browser window, so you'll need Firefox installed. As of today (3/9/2016), only Firefox 46 appears to be working (on my Mac at least - the latest versions on other platforms may work).
 
 ### Credit
