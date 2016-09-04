@@ -1,9 +1,6 @@
-.~c9*
-is_it_up_interface/interface/migrations
+.DS_Store
+__pycache__
+db.sqlite3
 is_it_up_venv/
-site_checker/settings.py
-tests/test_settings.py
-site_checker/settings.py
-tests/test_settings.py
-site_checker.log
-site_checker_test.log
+*.swp
+*.log

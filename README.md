@@ -1,31 +1,55 @@
-# isitup
-A website monitor that sends a tweet if a website is down or some other criterion is met
+# IsItUpZA
+A website monitor that sends a tweet if a website is down or comes back online, and shows a list of monitored sites with current statuses.
 
 ## Project Details
 ### Motivation
-To increase public awareness and scrutiny of South Africa's Government e-Services websites. If a website goes offline or does not function in some pre-defined way, drawing public attention to this fact may help to resolve whatever issue is causing the outage. Twitter is widely used in South Africa and displaying important website outage related information on Twitter should allow website managers and the public at large to keep an eye on critical digital services.
+To increase public awareness and scrutiny of South Africa's Government e-Services websites. If a website goes offline or does not function correctly, drawing public attention to this fact may help to resolve whatever issue is causing the outage. Twitter is widely used in South Africa and displaying important website outage and error related information on Twitter should allow website managers and the public at large to keep an eye on critical digital services.
 
 ### List of Features
-* The ability for an administrator to add a website to be monitored to a list
-* The ability for an administrator to set a monitoring period for a website
-* The ability for an administrator to set a Twitter account for all website status updates to be posted to
-* The ability to show a listing of all monitored sites with current statuses to a public user.
-* Maybe: The ability for a member of the public to submit a URL to be monitored. TODO: if we go for this option, we will need to have an anti-spam solution like a captcha. Having an unprotected form is just asking for trouble...
-* Maybe: The ability for an administrator to approve or reject the URL submission.
-* Maybe: The system should email the administrator when a new URL is submitted.
-* TODO: Apart from being online/offline, what other criteria would be good to monitor and report on?
+*Public* users have access to the following
 
-### Services to be Used
-* Each website added to the list will be contacted periodically at its public URL.
-* Twitter's API will be used to post status updates.
+1. A home page (This implementation is online at [isitupza.gorrog.org](http://isitupza.gorrog.org)) showing a list of sites being monitored. Sites are grouped into 'offline' (unreachable), 'problem' (sending an error code), and 'healthy' lists.
+  * All groupings show the last time the site was pinged
+  * The 'problem' grouping shows the error code the site is returning.
+
+2. An interface where details about a new site can be submitted.
+
+3. A Twitter account (Our implementation uses [@IsItUpZA](https://twitter.com/IsItUpZA)) showing tweets regarding sites that are experiencing issues or that have restored service. Public users are encouraged to follow this account in Twitter so that they will be notified whenever a critical e-service goes offline or becomes 'healthy' again after experienceing issues.
+
+In addition to the features above, *Administrators* can
+
+1. Add, edit and remove websites from the list. In addition to the URL, the following information is stored
+  * Monitoring period - How often should the site be checked?
+  * Website name
+  * Optional Twitter handle of a user who is responsible or interested in the status of this site. They will be '@mention'ed in any tweets relating to the site
+2. Access the list of submitted sites, and add remove edit these
+
+### Services Used:
+* Each website on the list is contacted periodically at its public URL.
+* Twitter's API is used to post status updates.
 
 ### Technical Details
-* The app will be hosted somewhere. TODO: Decide where. Roger has server space he pays for. Could host there
-* The app will use Flask for the admin and public interfaces. TODO: Figure out if Flask is the right choice here. I think it's a good idea since we both have experience with it, but I wonder how much time could be saved if we used the ORM in Django rather than writing SQL queires all the time. We could also investigate useing SQL Alchemy with Flask which may save time.
-* The app will store data somewhere. TODO: Figure out what the best choice here is. Again, Roger has access to various databases that can run on his hosted space.
-* In addition to the web interface, the app will have a constantly running Python script that does the checking of the sites. TODO: Figure out how to do this and see if this is going to be impossibly hard or not. This is the biggest unknown in the project since everything else has been at least touched on in the Rmotr course. There is something called a 'cron' job. Perhaps this can be set to automatically run a Python program.
-* If possible, it would be excellent to use Test Driven Development for this app. At the very least, having a user story will be good for defining our exact functions, even if we don't use it for functional tests.
-* Documentation will be handled by Landon? Roger? Both?
-* The app will be manually deployed somewhere unless we learn how to automatically deploy it. If hosting it on Roger's hosting provider, will automatic deployment even be possible?
-* The code will be open-sourece and will live on one (or both) of our Github accounts. Anyone will be welcome to copy and use the code.
-* The code will be licenced under the ??? licence.
+
+This service consist of 2 parts
+
+1. A website monitoring application called `site_checker`.
+  * Written in Python 3
+  * Runs as a Cron job according to a predefined schedule (every 5 minutes is recommended)
+  * Updates the `last_status` and `last_checked` fields of the `interface_site` table for each site that is due to be checked.
+  * Adds error information such as the error code, (we use `999` for completely offline) returned by the server and the error time to the `interface_error` table
+  * Sends a tweet to a predefined Twitter account if a site changes status from being healthy to either offline or problem (returning any HTTP status code > `399`).
+  * Sends a tweet to a predefined Twitter account if a site changes status from being either offline or problem (returning any HTTP status code > `399`) to healthy again.
+  * Written for a PostgreSQL database, but can be adapted to other databases through updating the relevant SQL queries.
+  * Backed by tests located at `site_checker/tests`. Run the tests from the `site_checker` directory with the command `PYTHONPATH=. python site_checker/tests/functional_tests.py` (if you have multiple versions of python installed, change the command from `python` to `python3`.)
+
+2. A web front end called `is_it_up_interface`.
+  * Uses Django 1.10
+  * Uses Django's stock Admin interface for interacting with the `interface_site`, `interface_error`, and `interface_submission` (used for user submitted sites tables).
+  * Backed by tests located at `is_it_up_interface\functional_tests.py`. Run them with this command from the project root directory: `python is_it_up_interface\functional_tests.py` (if you have multiple versions of python installed, change the command from `python` to `python3`.)
+    * Note that these tests use Selenium to drive a Firefox browser window, so you'll need Firefox installed. As of today (3/9/2016), only Firefox 46 appears to be working (on my Mac at least - the latest versions on other platforms may work).
+
+### Credit
+Written by Roger Gordon ([gorrog](http://gorrog.org)) and Landon Simmons ([landonain](https://github.com/landonain)) in August/September 2016 for the 'Demo Day' final project concluding [Rmotr.com](http://rmotr.com)'s Advanced Python class.
+
+### Licence
+This project and all code and images are licenced under the GNU GENERAL PUBLIC LICENSE Version 3. Please see LICENCE.txt for details. All supporting libraries, software and services used are licenced under their own licences.

@@ -100,10 +100,10 @@ class SiteCheckerTest(unittest.TestCase):
         site_id = results[0][0]
         error_timestamp = results[0][1]
         error_code = results[0][2]
-        sql_string = """ 
-            SELECT 
+        sql_string = """
+            SELECT
             id
-            FROM 
+            FROM
             interface_site
             WHERE
             url = 'http://gorrog.gorrog.poop'
@@ -184,7 +184,7 @@ class SiteCheckerTest(unittest.TestCase):
         """
         cur = self.myConnection.cursor()
         cur.execute(sql_string)
-        results_2 = cur.fetchall() 
+        results_2 = cur.fetchall()
         self.assertEqual(site_id, results_2[0][0])
         current_date_time = datetime.datetime.now(tz=error_timestamp.tzinfo)
         self.assertTrue(current_date_time - error_timestamp < datetime.timedelta(seconds=60))
