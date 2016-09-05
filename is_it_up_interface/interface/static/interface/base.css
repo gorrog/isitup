@@ -4,7 +4,6 @@ nav {
 
 body nav ul li a {
     font-size: 1.75em;
-    color: #fff;
     margin-top: 0px;
 }
 
@@ -25,10 +24,9 @@ body {
 body nav ul li a:link, a:visited {
     list-style: none;
     text-decoration: none;
-    color: #fff;
 }
 
-li a:hover, li a:active {
+body nav ul li a:hover, a:active {
     color: #ffb00b;
 }
 
@@ -38,4 +36,30 @@ section {
 
 p {
    padding: 0.5em 2em;
+}
+
+section a, section a:visited {
+    list-style: none;
+    text-decoration: none;
+    color: #fff;
+}
+
+a:hover, li a:active {
+    color: #ffb00b;
+}
+
+a:link, a:visited {
+    list-style: none;
+    text-decoration: none;
+    color: #fff;
+}
+
+a {
+    color: #fff;
+    text-shadow:1px 1px 2px black, 0 0 5px blue, 0 0 5px #428bca;
+}
+
+section a:hover, section a:active {
+    color: #ffb00b;
+    text-decoration: none;
 }

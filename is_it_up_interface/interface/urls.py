@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^submit/', views.submission, name='submission'),
     url(r'^thanks/', views.thanks, name='thanks'),
+    url(r'^contact/', views.contact, name='contact'),
 ]

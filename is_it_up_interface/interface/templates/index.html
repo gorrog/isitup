@@ -23,7 +23,9 @@
             <th>
             Last checked
             </th>
-
+            <th>
+            Error Percentage
+            </th>
         </tr>
         {% for site in offline_sites_list %}
         <tr class="bad_table">
@@ -31,10 +33,13 @@
             {{ site.site_name }}
             </td>
             <td>
-            {{ site.url }}
+            <a href="{{ site.url }}">{{ site.url }}</a>
             </td>
             <td>
             {{ site.last_checked }}
+            </td>
+            <td>
+                {{ site.error_percentage }}
             </td>
         </tr>
         {% endfor %}
@@ -58,6 +63,9 @@
             <th>
             Last checked
             </th>
+            <th>
+            Error Percentage
+            </th>
         </tr>
         {% for site in down_sites_list %}
         <tr class="bad_table">
@@ -65,13 +73,16 @@
             {{ site.site_name }}
             </td>
             <td>
-            {{ site.url }}
+            <a href="{{ site.url }}">{{ site.url }}</a>
             </td>
             <td>
             {{ site.last_status }}
             </td>
             <td>
             {{ site.last_checked }}
+            </td>
+            <td>
+            {{ site.error_percentage }}
             </td>
         </tr>
         {% endfor %}
@@ -92,6 +103,9 @@
             <th>
             Last checked
             </th>
+            <th>
+            Error Percentage
+            </th>
         </tr>
         {% for site in up_sites_list %}
         <tr class="bad_table">
@@ -99,10 +113,13 @@
             {{ site.site_name }}
             </td>
             <td>
-            {{ site.url }}
+            <a href="{{ site.url }}">{{ site.url }}</a>
             </td>
             <td>
             {{ site.last_checked }}
+            </td>
+            <td>
+                {{ site.error_percentage }}
             </td>
         </tr>
         {% endfor %}
